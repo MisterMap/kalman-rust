@@ -8,7 +8,11 @@ edition = "2018"
 
 [dependencies]
 ndarray = "0.15.0"
+nalgebra = "*"
+num-traits = "*"
+
+[lib]
 
 [[bin]]
 name = "kalman-rust"
-path = "main.rs"
+
