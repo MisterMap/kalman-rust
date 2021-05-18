@@ -12,7 +12,9 @@ nalgebra = "*"
 num-traits = "*"
 
 [lib]
+name="kalman_rust"
+test = true
 
-[[bin]]
-name = "kalman-rust"
+#[[bin]]
+#name = "kalman-rust"
 
