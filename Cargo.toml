@@ -11,13 +11,15 @@ ndarray = "0.15.0"
 rand = "0.6.5"
 nalgebra = "*"
 approx = "*"
-nalgebra = "*"
 num-traits = "*"
 
 [lib]
 name="kalman_rust"
 test = true
 
-#[[bin]]
-#name = "kalman-rust"
+[profile.release]
+debug = true
+
+[[bin]]
+name = "kalman-rust"
 

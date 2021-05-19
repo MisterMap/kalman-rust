@@ -1,5 +1,5 @@
 pub mod kalman;
-pub use kalman::{KalmanState, KalmanFilter};
+pub use kalman::{KalmanState, KalmanFilter, make_simple_kalman_filter};
 
 struct RandomMotionParameters {
     initial_state : ndarray::Array1<f64>,

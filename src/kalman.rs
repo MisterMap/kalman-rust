@@ -39,10 +39,10 @@ impl<T: RealField, N: Dim, K: Dim> KalmanFilter<T, N, K> where
     DefaultAllocator: na::allocator::Allocator<T, <<K as na::DimMin<K>>::Output as na::DimSub<na::Const<1_usize>>>::Output>,
     K: na::DimMin<K> + na::DimName,
     N: na::DimName,
-    <K as na::DimMin<K>>::Output: na::DimSub<na::Const<1_usize>>
+    <K as na::DimMin<K>>::Output: na::DimSub<na::Const<1_usize>>,
 {
-    pub fn filter_state(&self, measurement: OVector<T, K>,
-                    previous_state: KalmanState<T, N>, eps:T) -> KalmanState<T, N> {
+    pub fn filter_state(&self, measurement: &OVector<T, K>,
+                    previous_state: &KalmanState<T, N>, eps:T) -> KalmanState<T, N> {
         // Prediction
         let state  =  &self.motion_model * &previous_state.state;
         let covariance = &self.motion_model *
@@ -68,15 +68,19 @@ impl<T: RealField, N: Dim, K: Dim> KalmanFilter<T, N, K> where
         return KalmanState{state: final_state, covariance: final_covariance};
     }
 
-    pub fn filter_states(&self, measurements: Vec<OVector<T, K>>,
+    pub fn filter_states(&self, measurements: &Vec<OVector<T, K>>,
                     initial_state: KalmanState<T, N>, eps:T) -> Vec<KalmanState<T, N>> {
-        let mut current_state = initial_state;
-        let mut states: Vec<KalmanState<T, N>> = Vec::new();
-        for measurement in measurements {
-            current_state = self.filter_state(measurement, current_state, eps);
-            states.push(current_state.clone())
-        }
-        states
+        // let mut current_state = initial_state;
+        // let mut states: Vec<KalmanState<T, N>> = Vec::new();
+        // for measurement in measurements {
+        //     current_state = self.filter_state(measurement, &current_state, eps);
+        //     states.push(current_state.clone())
+        // }
+        // states
+            measurements
+            .iter()
+            .scan(initial_state, |state, x| {Some(self.filter_state(x, state, eps))})
+            .collect()
     }
 }
 
@@ -91,10 +95,10 @@ impl<T: std::fmt::Debug + RealField, N: Dim> std::fmt::Debug for KalmanState<T, 
 
 pub fn make_simple_kalman_filter(time_delta: f64, motion_noise: f64,
                                  measurement_noise: f64) -> KalmanFilter<f64, na::U2, na::U1> {
-    let motion_model: Matrix2<f64> = Matrix2::from_vec(vec![1., time_delta, 0., 1.]);
+    let motion_model: Matrix2<f64> = Matrix2::from_vec(vec![1., 0., time_delta, 1.]);
 
     let state_motion_error_model: Matrix2x1<f64> = Matrix2x1::from_vec(vec![time_delta * time_delta / 2., time_delta]);
-    let motion_error_model = state_motion_error_model *
+    let motion_error_model: Matrix2<f64> = state_motion_error_model *
         state_motion_error_model.transpose() * motion_noise * motion_noise;
 
     let measurement_model: Matrix1x2<f64> = Matrix1x2::from_vec(vec![1.0, 0.0]);
