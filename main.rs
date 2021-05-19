@@ -1,26 +1,13 @@
-use ndarray::arr2;
+#[macro_use]
+extern crate approx; // For the macro relative_eq!
+extern crate nalgebra as na;
+use na::{Vector3, Rotation3};
 
 fn main() {
-    let a = arr2(&[[1., 2, 3], [4, 5, 6]]);
+    let axis  = Vector3::x_axis();
+    let angle = 1.57;
+    let b     = Rotation3::from_axis_angle(&axis, angle);
 
-    let b = arr2(&[[6., 5, 4],
-                   [3, 2, 1]]);
-
-    let sum = &a + &b;
-
-    println!("{}", a);
-    println!("+");
-    println!("{}", b);
-    println!("=");
-    println!("{}", sum);
-
-    let a1 = arr2(&[[1., 2, 3],
-                   [4, 5, 6],
-                    [1, 1, 1]]);
-
-    let b1 = arr2(&[[6., 5, 4],
-                   [3, 2, 1],
-                    [1,1 ,1]]);
-    let mul = a1.dot(&b1);
-    println!("{}", mul)
+    relative_eq!(b.axis().unwrap(), axis);
+    relative_eq!(b.angle(), angle);
 }
